@@ -8,7 +8,23 @@ from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 
 
+def load_dotenv_if_present(dotenv_path: str = ".env"):
+    if not os.path.exists(dotenv_path):
+        return
+    with open(dotenv_path, "r", encoding="utf-8") as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
 def create_s3_client():
+    load_dotenv_if_present()
     region = os.getenv("AWS_REGION", "us-east-1")
     endpoint_url = os.getenv("S3_ENDPOINT_URL")
     return boto3.client("s3", region_name=region, endpoint_url=endpoint_url)
