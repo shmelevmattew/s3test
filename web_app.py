@@ -3,6 +3,7 @@ import os
 from typing import List
 
 import boto3
+from botocore.config import Config
 from botocore.exceptions import ClientError
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
@@ -26,8 +27,13 @@ def load_dotenv_if_present(dotenv_path: str = ".env"):
 def create_s3_client():
     load_dotenv_if_present()
     region = os.getenv("AWS_REGION", "us-east-1")
-    endpoint_url = os.getenv("S3_ENDPOINT_URL")
-    return boto3.client("s3", region_name=region, endpoint_url=endpoint_url)
+    endpoint_url = os.getenv("S3_ENDPOINT_URL") or os.getenv("S3_URL")
+    return boto3.client(
+        "s3",
+        region_name=region,
+        endpoint_url=endpoint_url,
+        config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+    )
 
 
 app = FastAPI(title="S3 Web UI")
