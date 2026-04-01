@@ -4,6 +4,7 @@
 - загрузка файла в бакет
 - просмотр списка объектов
 - скачивание файла из бакета
+- веб-интерфейс (FastAPI)
 
 ## 1) Установка
 
@@ -48,4 +49,21 @@ python s3_tool.py list --bucket my-bucket --prefix docs/
 ```bash
 python s3_tool.py download --bucket my-bucket --key docs/local.txt --out ./downloads/local.txt
 ```
+
+## 4) Веб-версия с UI
+
+Запуск:
+
+```bash
+uvicorn web_app:app --reload --host 0.0.0.0 --port 8000
+```
+
+Открой в браузере:
+
+`http://localhost:8000`
+
+В UI доступны:
+- загрузка файла в S3
+- просмотр объектов бакета (с prefix)
+- скачивание объектов кнопкой "Скачать"
 # s3test
